@@ -24,3 +24,11 @@ def iniciar_sesion(email, password):
 
     if usuarios_existentes.verificar_password(password_plano = password):
         pass
+
+
+def encontrar_todos_los_usuarios():
+    usuarios = Usuario.query.all()
+
+    print(usuarios)
+
+    return usuarios

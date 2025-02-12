@@ -1,11 +1,20 @@
 from flask import Flask, render_template, request, redirect, url_for
 
-from methods import crear_cuenta, iniciar_sesion
+from methods import crear_cuenta, iniciar_sesion, encontrar_todos_los_usuarios
 
 def cargar_rutas(app):
 # Este bloque de código es la base para todas rutas
   @app.route('/')
   def pagina():
+    lista_usuarios = encontrar_todos_los_usuarios()
+
+    for usuario in lista_usuarios:
+      print(f"""
+      Usuario: {usuario.name}
+      Correo: {usuario.email}
+      Password: {usuario.password}
+      """)
+
     return render_template('index.html')
 
   # Esta es otra ruta
