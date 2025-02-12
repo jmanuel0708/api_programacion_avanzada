@@ -23,7 +23,7 @@ db.init_app(app)
 
 cargar_rutas(app)
 
-app.run(port=8000)
+app.run(port=8000, debug=True)
 
 # El método run le va a indicar a nuestro servidor que va a comenzar
 # a recibir peticiones (servir)
