@@ -3,37 +3,31 @@ from flask import Flask, render_template, request, redirect, url_for
 from methods import crear_cuenta, iniciar_sesion, encontrar_todos_los_usuarios
 
 def cargar_rutas(app):
-# Este bloque de código es la base para todas rutas
+  # Ruta raíz
   @app.route('/<status>')
   def pagina(status):
-    lista_usuarios = encontrar_todos_los_usuarios()
-
-#    for usuario in lista_usuarios:
-#      print(f"""
-#      Usuario: {usuario.name}
-#      Correo: {usuario.email}
-#      Password: {usuario.password}
-#      """)
-
+#     for usuario in lista_usuarios:
+#       print(f''' 
+#     nombre usuario: {usuario.name}
+#     correo usuario: {usuario.email}
+#     contraseña usuario: {usuario.password}
     
+# ''')
+
+
     print(status)
     return render_template('index.html')
 
   # Esta es otra ruta
   @app.route('/login')
   def informacion_jose():
-
     resultado = request.args.get('status')
-
-
-    return render_template('login.html')
+    return render_template('login.html', estado=resultado)
 
   # Esta es otra ruta
   @app.route('/signup')
   def datos():
-
     resultado = request.args.get('status')
-
     return render_template('signup.html', estado=resultado)
 
   # Esta ruta va a manejar la información
@@ -46,9 +40,9 @@ def cargar_rutas(app):
     print(f'''
       Correo: {email}
       Contraseña: {password}
-  ''')
+    ''')
 
-    respuesta_login iniciar_sesion()
+    respuesta_login = iniciar_sesion(email, password)
 
     if respuesta_login['status'] == 'error':
       return redirect(url_for('informacion_jose', status=respuesta_login['status']))
@@ -66,17 +60,15 @@ def cargar_rutas(app):
     nombre: {nombre}
     correo: {email}
     passoword: {password}
-  ''')
+    ''')
 
-    respuesta_signup = crear_cuenta(nombre,email,password)
+    respuesta_signup = crear_cuenta(nombre, email, password)
 
     print(respuesta_signup)
 
     if respuesta_signup['status'] == 'error':
       return redirect(url_for('datos', status=respuesta_signup['status']))
 
-
-    
     return redirect(url_for('pagina', status=respuesta_signup['status']))
 
   @app.route('/error')
