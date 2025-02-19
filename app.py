@@ -4,7 +4,7 @@ from flask import Flask
 # Desde el archivo routes quiero que importes la función "cargar_rutas"
 from routes import cargar_rutas
 
-from extensions import db
+from extensions import db, jwt
 
 # flask: Librería
 # Flask: módulo (clase)
@@ -18,7 +18,12 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres.zfhvwerzpdluqbkat
 # 2.- Desactivamos el seguimiento de modificaciones
 app.config['SQLACHEMY_TRACK_MODIFICATIONS'] = False
 
+app.config['JWT_SECRET_KEY'] = 'c6krTENs82o7pib'
+
+
 db.init_app(app)
+
+jwt.init_app(app)
 
 
 cargar_rutas(app)

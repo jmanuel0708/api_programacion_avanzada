@@ -1,5 +1,9 @@
 from models import Usuario
 
+from extensions import jwt
+
+from flask_jwt_extended import create_access_token
+
 def crear_cuenta(nombre, email, password):
     
     usuario_existente = Usuario.query.filter_by(email=email).first()
@@ -23,7 +27,14 @@ def iniciar_sesion(email, password):
         return {'status': 'error', 'error': 'La cuenta no existe'}
 
     if usuarios_existentes.verificar_password(password_plano = password):
-        pass
+        print("Inicio de sesion exitoso")
+        token_de_acceso = create_access_token(identity=usuarios_existentes.name)
+        print(token_de_acceso)
+        return{'status':'ok', 'token': token_de_acceso}
+
+    else:
+        print("La contraseña es incorrecta")
+        return {'status':'error', 'error':'Contraseña incorrecta'}
 
 
 def encontrar_todos_los_usuarios():
