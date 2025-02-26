@@ -4,7 +4,7 @@ from methods import crear_cuenta, iniciar_sesion, encontrar_todos_los_usuarios
 
 from extensions import jwt
 
-from flask_jwt_extended import decode_token
+from flask_jwt_extended import decode_token, verify_jwt_in_request, get_jwt_identity
 
 firma = 'c6krTENs82o7pib'
 
@@ -13,19 +13,56 @@ def cargar_rutas(app):
     @app.route('/')
     def pagina():
 
-        return render_template('index.html')
+        logged = False
+
+        try:
+            verify_jwt_in_request()
+            logged = True
+
+        except Exception as error:
+            logged = False
+
+        return render_template('index.html', logged=logged)
 
     # Esta es otra ruta
     @app.route('/login')
     def informacion_jose():
 
+        logged = False
+
+        try:
+            verify_jwt_in_request()
+            logged = True
+        except Exception as error:
+            logged = False
+            print(error)
+
         resultado = request.args.get('status')
-        return render_template('login.html', estado=resultado)
+        if logged == True:
+            return redirect(url_for('pantalla_usuario'))
+        else:
+            return render_template('login.html', estado=resultado)
 
     # Esta es otra ruta
     @app.route('/signup')
     def datos():
+
+        logged = False
+
+        try:
+            verify_jwt_in_request()
+            logged = True
+        except Exception as error:
+            logged = False
+            print(error)
+
         resultado = request.args.get('status')
+        if logged == True:
+            return redirect(url_for('pantalla_usuario'))
+        else:
+            return render_template('login.html', estado=resultado)
+        
+        
         return render_template('signup.html', estado=resultado)
 
     # Esta ruta va a manejar la información
@@ -37,7 +74,6 @@ def cargar_rutas(app):
 
         print(f'''
             Correo: {email}
-            Contraseña: {password}
         ''')
 
         respuesta_login = iniciar_sesion(email, password)
@@ -61,7 +97,6 @@ def cargar_rutas(app):
         print(f'''
         nombre: {nombre}
         correo: {email}
-        passoword: {password}
         ''')
 
         respuesta_signup = crear_cuenta(nombre, email, password)
@@ -80,17 +115,19 @@ def cargar_rutas(app):
     
     @app.route('/usuario')
     def pantalla_usuario():
-        token = request.cookies.get('access_token')
+        try:
+            verify_jwt_in_request()
+            nombre_de_usuario = get_jwt_identity()
+            return render_template('user.html', nombre=nombre_de_usuario)
+        except Exception as error:
+            print('La cookie no existe o está mal')
+            print(f'La razón es: {error}')
 
-
-        if token:
-            try:
-                informacion_token = decode_token(token)
-                print(informacion_token)
-                return render_template('user.html', nombre=informacion_token['sub'])
-            except:
-                print('El token viene incorrecto')
-                return redirect(url_for('informacion_jose'))
-            
-        else:
             return redirect(url_for('informacion_jose'))
+        
+    @app.route('/logout')
+    def cerrar_sesion():
+        respuesta = make_response(redirect(url_for('pagina')))
+        respuesta.set_cookie('access_token', '')
+
+        return respuesta

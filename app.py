@@ -20,6 +20,12 @@ app.config['SQLACHEMY_TRACK_MODIFICATIONS'] = False
 
 app.config['JWT_SECRET_KEY'] = 'c6krTENs82o7pib'
 
+app.config['JWT_TOKEN_LOCATION'] = ['cookies']
+
+app.config['JWT_ACCESS_COOKIE_NAME'] = 'access_token'
+
+app.config['JWT_COOKIE_CSRF_PROTECTION'] = False
+
 
 db.init_app(app)
 

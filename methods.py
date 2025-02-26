@@ -30,7 +30,7 @@ def iniciar_sesion(email, password):
 
     if usuarios_existentes.verificar_password(password_plano = password):
         
-        caducidad = timedelta(minutes=3)
+        caducidad = timedelta(minutes=15)
         
         print("Inicio de sesion exitoso")
         token_de_acceso = create_access_token(identity=usuarios_existentes.name, expires_delta=caducidad)
