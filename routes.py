@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, make_response
 
-from methods import crear_cuenta, iniciar_sesion, encontrar_todos_los_usuarios
+from methods import crear_cuenta, iniciar_sesion, encontrar_usuario_por_id
 
 from extensions import jwt
 
@@ -60,11 +60,8 @@ def cargar_rutas(app):
         if logged == True:
             return redirect(url_for('pantalla_usuario'))
         else:
-            return render_template('login.html', estado=resultado)
+            return render_template('signup.html', estado=resultado)
         
-        
-        return render_template('signup.html', estado=resultado)
-
     # Esta ruta va a manejar la información
     # Este método solo funcionará para el inicio de sesión
     @app.route('/manipulacion', methods=['POST'])
@@ -118,7 +115,13 @@ def cargar_rutas(app):
         try:
             verify_jwt_in_request()
             nombre_de_usuario = get_jwt_identity()
-            return render_template('user.html', nombre=nombre_de_usuario)
+            id_del_usuario = request.args.get('user_id')
+            datos_usuario = encontrar_usuario_por_id(id_del_usuario)
+            datos_usuario = [datos_usuario.id, datos_usuario.name, datos_usuario.email]
+
+            print(datos_usuario)
+
+            return render_template('user.html', user_data=datos_usuario)
         except Exception as error:
             print('La cookie no existe o está mal')
             print(f'La razón es: {error}')
@@ -131,3 +134,17 @@ def cargar_rutas(app):
         respuesta.set_cookie('access_token', '')
 
         return respuesta
+    
+    @app.route('/user_info')
+    def obtener_info_usuario():
+        try:
+            verify_jwt_in_request()
+            user_token = request.cookies.get('access_token')
+            token_info = decode_token(user_token)
+            id_usuario = token_info['user_id']
+
+            return redirect(url_for('pantalla_usuario', user_id=id_usuario))
+
+        except Exception as error:
+            print(error)
+            return redirect(url_for('pagina'))
