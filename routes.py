@@ -103,7 +103,7 @@ def cargar_rutas(app):
         if respuesta_signup['status'] == 'error':
             return redirect(url_for('datos', status=respuesta_signup['status']))
 
-        return redirect(url_for('pagina', status=respuesta_signup['status']))
+        return redirect(url_for('pantalla_usuario'))
 
     @app.route('/error')
     def pantalla_error():
